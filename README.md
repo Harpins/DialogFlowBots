@@ -61,3 +61,5 @@ python bot_telegram.py
 python bot_vk.py
 ```
 Боты друг от друга независимы
+
+

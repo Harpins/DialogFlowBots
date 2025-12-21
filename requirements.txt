@@ -3,3 +3,4 @@ environs==14.5.0
 requests==2.32.5
 google-cloud-dialogflow==2.44.0
 google-cloud-api-keys==0.6.0
+vk_api==11.10.0

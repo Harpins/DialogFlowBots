@@ -4,6 +4,7 @@ from settings import VK_GROUP_TOKEN, PROJECT_ID
 from vk_api.utils import get_random_id
 from logger import get_logger
 from dialogflowapi import detect_intent_text
+from error_bot import send_error_bot_note
 
 logger = get_logger(__name__)
 
@@ -16,7 +17,7 @@ def send_vk_message(vk_api, user_id, message_text):
         vk_api.messages.send(
             user_id=user_id, message=message_text, random_id=get_random_id()
         )
-    except vk_api.exceptions.ApiError as e:
+    except vk_api.exceptions.ApiError as e:  
         if e.code == 901:
             logger.warning(
                 f"Ошибка 901: Пользователь {user_id} не разрешил сообщения боту."
@@ -26,9 +27,9 @@ def send_vk_message(vk_api, user_id, message_text):
         elif e.code == 15:
             logger.warning(f"Ошибка 15: Бот в черном списке у пользователя {user_id}")
         else:
-            logger.error(
-                f"Ошибка VK API [{e.code}]: {e.error_msg} (пользователь {user_id})"
-            )
+            err_msg = f"Ошибка VK API [{e.code}]: {e.error_msg} (пользователь {user_id})"
+            logger.error(err_msg)
+            send_error_bot_note(err_msg)
 
 
 def handle_message(event, vk_api):
@@ -52,9 +53,9 @@ def handle_message(event, vk_api):
     answer_text = df_response.get("answer_text", "").strip()
     fallback = df_response.get("is_fallback", False)
     if not answer_text:
-        logger.warning(
-            f"DF не вернул ответ на сообщение '{user_message}' пользователя '{user_id}'"
-        )
+        warning_text = f"DF не вернул ответ на сообщение '{user_message}' пользователя '{user_id}'"
+        logger.warning(warning_text)
+        send_error_bot_note(warning_text)
         return
     if fallback:
         logger.info(f"Fallback-интент для пользователя {user_id}")
@@ -77,4 +78,6 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         logger.info("Бот остановлен вручную.")
     except Exception as e:
-        logger.critical(f"Критическая ошибка longpoll: {e}", exc_info=True)
+        err_msg = f"Критическая ошибка VK longpoll: {e}"
+        logger.critical(err_msg, exc_info=True)
+        send_error_bot_note(err_msg)
