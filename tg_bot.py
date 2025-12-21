@@ -1,22 +1,11 @@
 import asyncio
-import environs
-import logging
+from logger import get_logger
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
 from dialogflowapi import detect_intent_text
+from settings import TG_BOT_TOKEN, PROJECT_ID, LANGUAGE_CODE
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-)
-logger = logging.getLogger(__name__)
-
-env = environs.Env()
-env.read_env()
-
-TG_BOT_TOKEN = env.str("TG_BOT_TOKEN")
-PROJECT_ID = env.str("PROJECT_ID")
-LANGUAGE_CODE = "ru-RU"
+logger = get_logger(__name__)
 
 bot = Bot(token=TG_BOT_TOKEN)
 dp = Dispatcher()
@@ -49,6 +38,7 @@ async def df_message(message: types.Message):
         await message.answer(answer_text)
 
     except Exception as e:
+        
         logger.error(
             f"Ошибка при обработке сообщения от {tg_user} "
             f"(чат {session_id}): {e}",
@@ -59,13 +49,16 @@ async def df_message(message: types.Message):
         )
 
 async def main():
+    
     logger.info("Бот запущен")
     try:
         await dp.start_polling(bot)
     except Exception as e:
+        
         logger.critical("Критическая ошибка при polling:", exc_info=True)
     finally:
         await bot.session.close()
+        
         logger.info("Бот остановлен")
 
 if __name__ == "__main__":
