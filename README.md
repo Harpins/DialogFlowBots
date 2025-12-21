@@ -1,4 +1,10 @@
 # DialogFlowBots
+<body>
+    <div class="center">
+        <img src="vk_bot_example.gif" alt="бот ВК" height=300 />
+        <img src="tg_bot_example.gif" alt="бот ТГ" height=300 />
+    </div>
+</body>
 
 Проект содержит два независимых чат-бота (для Telegram и для VK-сообществ), использующих Google Dialogflow ES для обработки сообщений.  
 Боты отвечают только на сообщения, которые уверенно распознает Dialogflow. Для ВК при fallback-интенте или пустом ответе бот **будет молчать** (сделано намеренно).
