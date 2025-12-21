@@ -4,7 +4,7 @@ from settings import VK_GROUP_TOKEN, PROJECT_ID
 from vk_api.utils import get_random_id
 from logger import get_logger
 from dialogflowapi import detect_intent_text
-from error_bot import send_error_bot_note
+from error_bot import send_error_bot_note_sync
 
 logger = get_logger(__name__)
 
@@ -29,7 +29,7 @@ def send_vk_message(vk_api, user_id, message_text):
         else:
             err_msg = f"Ошибка VK API [{e.code}]: {e.error_msg} (пользователь {user_id})"
             logger.error(err_msg)
-            send_error_bot_note(err_msg)
+            send_error_bot_note_sync(err_msg)
 
 
 def handle_message(event, vk_api):
@@ -55,7 +55,7 @@ def handle_message(event, vk_api):
     if not answer_text:
         warning_text = f"DF не вернул ответ на сообщение '{user_message}' пользователя '{user_id}'"
         logger.warning(warning_text)
-        send_error_bot_note(warning_text)
+        send_error_bot_note_sync(warning_text)
         return
     if fallback:
         logger.info(f"Fallback-интент для пользователя {user_id}")
@@ -80,4 +80,4 @@ if __name__ == "__main__":
     except Exception as e:
         err_msg = f"Критическая ошибка VK longpoll: {e}"
         logger.critical(err_msg, exc_info=True)
-        send_error_bot_note(err_msg)
+        send_error_bot_note_sync(err_msg)

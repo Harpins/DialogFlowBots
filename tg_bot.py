@@ -42,31 +42,31 @@ async def df_message(message: types.Message):
             answer_text = "Не могу ответить"
             warning_msg = f"DF не вернул ответ на сообщение '{user_text}' пользователя '{tg_user}'"
             logger.warning(warning_msg)
-            send_error_bot_note(warning_msg)
+            await send_error_bot_note(warning_msg)
 
         await message.answer(answer_text)
 
     except Exception as e:
         err_msg = f"Ошибка при обработке сообщения от {tg_user}" f"(чат {session_id}): {e}"
         logger.error(err_msg, exc_info=True)
-        send_error_bot_note(err_msg)
+        await send_error_bot_note(err_msg)
         await message.answer("Произошла ошибка при обращении к ИИ")
 
 
 async def main():
 
     logger.info("Бот запущен")
-    send_error_bot_note(f"tg-бот запущен")
+    await send_error_bot_note(f"tg-бот запущен")
     try:
         await dp.start_polling(bot)
     except Exception as e:
         logger.critical("Критическая ошибка при tg-polling:", exc_info=True)
-        send_error_bot_note(f"Критическая ошибка при polling tg-бота: {e}")
+        await send_error_bot_note(f"Критическая ошибка при polling tg-бота: {e}")
     finally:
         await bot.session.close()
         stop_message = "tg-бот остановлен"
         logger.info(stop_message)
-        send_error_bot_note(stop_message)
+        await send_error_bot_note(stop_message)
 
 
 if __name__ == "__main__":
