@@ -49,12 +49,16 @@ def handle_message(event, vk_api):
         language_code="ru-RU",
     )
 
-    answer_text = df_response.get("answer_text", "")
+    answer_text = df_response.get("answer_text", "").strip()
+    fallback = df_response.get("is_fallback", False)
     if not answer_text:
-        answer_text = "Не могу ответить"
         logger.warning(
             f"DF не вернул ответ на сообщение '{user_message}' пользователя '{user_id}'"
         )
+        return
+    if fallback:
+        logger.info(f"Fallback-интент для пользователя {user_id}")
+        return
     send_vk_message(vk_api, user_id, answer_text)
     return
 
