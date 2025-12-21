@@ -1,3 +1,6 @@
+credentials
+*google_credentials.json
+*settings.json
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
