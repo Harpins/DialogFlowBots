@@ -12,29 +12,27 @@ from error_bot import send_error_bot_note
 
 logger = get_logger(__name__)
 
-bot = Bot(token=TG_BOT_TOKEN)
-dp = Dispatcher()
 
-
-@dp.message(Command("start"))
 async def cmd_start(message: types.Message):
     await message.answer("Привет! Просто напиши мне что-нибудь!")
 
 
-@dp.message(F.text)
-async def df_message(message: types.Message):
-    session_id = str(message.chat.id)
+async def fetch_df_message(
+    message: types.Message, language_code=LANGUAGE_CODE, project_id=PROJECT_ID
+):
+    chat_id = message.chat.id
+    session_id = f"tg_{chat_id}"
     user_text = message.text
     tg_user = message.from_user.id
 
     try:
-        logger.info(f"Пользователь {tg_user} (чат {session_id}): {user_text}")
+        logger.info(f"Пользователь {tg_user} (чат {chat_id}): {user_text}")
 
         df_response = detect_intent_text(
-            project_id=PROJECT_ID,
+            project_id=project_id,
             session_id=session_id,
             text=user_text,
-            language_code=LANGUAGE_CODE,
+            language_code=language_code,
         )
 
         answer_text = df_response.get("answer_text", "")
@@ -47,13 +45,21 @@ async def df_message(message: types.Message):
         await message.answer(answer_text)
 
     except Exception as e:
-        err_msg = f"Ошибка при обработке сообщения от {tg_user}" f"(чат {session_id}): {e}"
+        err_msg = (
+            f"Ошибка при обработке сообщения от {tg_user}" f"(чат {session_id}): {e}"
+        )
         logger.error(err_msg, exc_info=True)
         await send_error_bot_note(err_msg)
         await message.answer("Произошла ошибка при обращении к ИИ")
 
 
 async def main():
+
+    bot = Bot(token=TG_BOT_TOKEN)
+    dp = Dispatcher()
+
+    dp.message.register(cmd_start, Command("start"))
+    dp.message.register(fetch_df_message, F.text)
 
     logger.info("Бот запущен")
     await send_error_bot_note(f"tg-бот запущен")

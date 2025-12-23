@@ -32,7 +32,7 @@ def send_vk_message(vk_api, user_id, message_text):
             send_error_bot_note_sync(err_msg)
 
 
-def handle_message(event, vk_api):
+def handle_message(event, vk_api, project_id=PROJECT_ID):
     user_id = event.user_id
     user_message = event.text.strip()
 
@@ -41,10 +41,10 @@ def handle_message(event, vk_api):
 
     logger.info(f"Сообщение от пользователя {user_id}: {user_message}")
 
-    session_id = str(user_id)
+    session_id = f"vk_{user_id}"
 
     df_response = detect_intent_text(
-        project_id=PROJECT_ID,
+        project_id=project_id,
         session_id=session_id,
         text=user_message,
         language_code="ru-RU",

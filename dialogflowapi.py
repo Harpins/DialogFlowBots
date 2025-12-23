@@ -1,7 +1,6 @@
 from google.cloud import dialogflow_v2 as dialogflow
 from logger import get_logger
 import json
-from settings import PROJECT_ID, JSON_PATH
 
 logger = get_logger(__name__)
 
@@ -64,8 +63,8 @@ def load_intents_from_json(project_id, json_file_path="intents.json"):
     """
     try:
         with open(json_file_path, "r", encoding="utf-8") as file:
-            intents_dict = json.load(file)
-        logger.info(f"Загружено {len(intents_dict)} интентов из {json_file_path}")
+            intents_data = json.load(file)
+        logger.info(f"Загружено {len(intents_data)} интентов из {json_file_path}")
     except FileNotFoundError:
         logger.error(f"Файл {json_file_path} не найден.")
         return
@@ -76,9 +75,9 @@ def load_intents_from_json(project_id, json_file_path="intents.json"):
     successful = 0
     skipped = 0
 
-    for display_name, data in intents_dict.items():
-        questions = data.get("questions", [])
-        answer = data.get("answer", [])
+    for display_name, intent_details in intents_data.items():
+        questions = intent_details.get("questions", [])
+        answer = intent_details.get("answer", [])
 
         if isinstance(answer, str):
             message_texts = [answer]
@@ -116,6 +115,3 @@ def load_intents_from_json(project_id, json_file_path="intents.json"):
                 skipped += 1
 
     logger.info(f"Загрузка интентов завершена: успешно — {successful}, пропущено — {skipped}")
-    
-    
-#load_intents_from_json(PROJECT_ID, JSON_PATH)
